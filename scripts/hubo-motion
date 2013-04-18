@@ -74,9 +74,10 @@ Ach()
 
 	*)
 
-		sudo ach -1 -C $HUBO_REF_CHAN           -m 10 -n 3000 -o 666
-		sudo ach -1 -C $HUBO_STATE_CHAN         -m 10 -n 8000 -o 666
-		sudo ach -1 -C $HUBO_BOARD_CHAN         -m 10 -n 3000 -o 666
+#		sudo ach -1 -C $HUBO_REF_CHAN           -m 10 -n 3000 -o 666
+#		sudo ach -1 -C $HUBO_STATE_CHAN         -m 10 -n 8000 -o 666
+#		sudo ach -1 -C $HUBO_BOARD_CHAN         -m 10 -n 3000 -o 666
+#		hubo-ach make
 		sudo ach -1 -C $HUBO_RL_CTRL_CHAN       -m 10 -n 3000 -o 666
 		sudo ach -1 -C $HUBO_LL_CTRL_CHAN       -m 10 -n 3000 -o 666
 		sudo ach -1 -C $HUBO_RA_CTRL_CHAN       -m 10 -n 3000 -o 666
@@ -154,9 +155,14 @@ StartHubo()
 	*)
 	
 		Ach
-        
+        case "$2" in
+	'sim')
+		hubo-ach sim 
+	;;
+	*)
         sudo hubo-ach run
-
+	;;
+	esac
 		sudo control-daemon
 		sudo tech-console
 	;;
