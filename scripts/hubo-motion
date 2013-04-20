@@ -217,6 +217,7 @@ KillHubo()
         do
             sudo killall -v -s SIGKILL $entry
             sudo rm $LOCK_DIR/$entry
+            sudo rm /var/lock/hubo/control-daemon
         done
 	;;
 	esac

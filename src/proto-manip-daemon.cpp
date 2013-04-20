@@ -49,49 +49,10 @@
 
 #include "manip.h"
 
-
-/* Ach Channel IDs */
-ach_channel_t chan_hubo_ref;      // Feed-Forward (Reference)
-ach_channel_t chan_hubo_state;    // Feed-Back (State)
-
-
 int main( int argc, char **argv )
 {
-
-    /* Open Ach Channel */
-    int rr = ach_open(&chan_hubo_ref, HUBO_CHAN_REF_NAME , NULL);
-    assert( ACH_OK == rr );
-
-    rr = ach_open(&chan_hubo_state, HUBO_CHAN_STATE_NAME , NULL);
-    assert( ACH_OK == rr );
-
-
-
-    /* Create initial structures to read and write from */
-    struct hubo_ref H_ref;
-    struct hubo_state H_state;
-    memset( &H_ref,   0, sizeof(H_ref));
-    memset( &H_state, 0, sizeof(H_state));
-
-    /* for size check */
-    size_t fs;
-
-    /* Get the current feed-forward (state) */
-    rr = ach_get( &chan_hubo_state, &H_state, sizeof(H_state), &fs, NULL, ACH_O_LAST );
-    if(ACH_OK != rr) {
-        assert( sizeof(H_state) == fs );
-    }
-
-
-
-
-    H_ref.ref[RSP] = 0.1;
-    ach_put( &chan_hubo_ref, &H_ref, sizeof(H_ref));
-
-
     Hubo_Control hubo("proto-manip-daemon");
-    H_ref.ref[RSP] = 0.2;
-    ach_put( &chan_hubo_ref, &H_ref, sizeof(H_ref));
+
     ach_channel_t chan_manip_cmd;
 
     int r = ach_open( &chan_manip_cmd, CHAN_HUBO_MANIP, NULL );
@@ -101,8 +62,6 @@ int main( int argc, char **argv )
     memset( &manip, 0, sizeof(manip) );
 
     hubo.update();
-
-    
 
     Eigen::Isometry3d Br, Bl;
     Vector6d right, left, zeros; zeros.setZero();
@@ -123,10 +82,21 @@ int main( int argc, char **argv )
         manip.translation[LEFT][i] = Bl(i,3);
     }
 
+
+   // make some better default values
+    manip.translation[RIGHT][0] = 0.2;
+    manip.translation[RIGHT][1] = -0.3;
+    manip.translation[RIGHT][2] = -0.2;
+
+    manip.translation[LEFT][0] = 0.2;
+    manip.translation[LEFT][1] = 0.3;
+    manip.translation[LEFT][2] = -0.2;
+
+
     std::cout << "Putting first transformation" << std::endl;
     ach_put( &chan_manip_cmd, &manip, sizeof(manip) );
 
-//    size_t fs;
+    size_t fs;
 
     std::cout << "About to start loop" << std::endl;
 
@@ -161,21 +131,13 @@ int main( int argc, char **argv )
         hubo.huboArmIK( left, Bl, zeros, LEFT );
         hubo.setLeftArmAngles( left );
 
-	right[0] = 0.4;
-
-        H_ref.ref[RSP] = right[0];
-        H_ref.ref[RSR] = right[1];
-        H_ref.ref[RSY] = right[2];
-        H_ref.ref[REB] = right[3];
-        H_ref.ref[RWY] = right[4];
-        H_ref.ref[RWP] = right[5];
-
-        /* Write to the feed-forward channel */
-        ach_put( &chan_hubo_ref, &H_ref, sizeof(H_ref));
         // Send commands off to the control daemon
-//        hubo.sendControls();
+        hubo.sendControls();
+	usleep(50*1000);	// sleep for 50ms
     }
     
+
+
 
     ach_close( &chan_manip_cmd );
 
