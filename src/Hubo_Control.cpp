@@ -92,7 +92,7 @@ void Hubo_Control::controlInit()
     memset( &H_gains, 0, sizeof(H_gains) );
 
 
-    setJointParams( &H_Param, &H_State );
+    setJointParams( &H_Param, &H_State, &H_gains );
 
     for(int i=0; i<8; i++)
         ctrlOn[i] = false;
