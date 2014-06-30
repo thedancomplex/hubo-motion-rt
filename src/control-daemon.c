@@ -137,7 +137,14 @@ void controlLoop()
     memset( &H_param, 0, sizeof(H_param) );
     memset( &C_state, 0, sizeof(C_state) );
 
-    setJointParams( &H_param, &H_state);
+    // send null to pwm gains - dan
+    hubo_pwm_gains_t H_gains;
+    memset( &H_gains, 0, sizeof(H_gains) );
+
+
+    setJointParams( &H_Param, &H_State, &H_gains );
+
+//    setJointParams( &H_param, &H_state);
     if(setCtrlDefaults( &ctrl )==-1)
         return;
 
