@@ -142,7 +142,7 @@ void controlLoop()
     memset( &H_gains, 0, sizeof(H_gains) );
 
 
-    setJointParams( &H_Param, &H_State, &H_gains );
+    setJointParams( &H_param, &H_state, &H_gains );
 
 //    setJointParams( &H_param, &H_state);
     if(setCtrlDefaults( &ctrl )==-1)
