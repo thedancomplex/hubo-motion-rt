@@ -108,7 +108,15 @@ int main() {
     hubo_param H_param;
     hubo_state H_state;
 
-    setJointParams( &H_param, &H_state );
+
+    // send null to pwm gains - dan
+    hubo_pwm_gains_t H_gains;
+    memset( &H_gains, 0, sizeof(H_gains) );
+
+
+    setJointParams( &H_param, &H_state, &H_gains );
+
+//    setJointParams( &H_param, &H_state );
     setSensorDefaults( &H_param );
 
     char *buf;
