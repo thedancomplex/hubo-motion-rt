@@ -87,6 +87,11 @@ void Hubo_Control::controlInit()
 
     memset( jointAngleCalibration, 0, sizeof(jointAngleCalibration[0])*HUBO_JOINT_COUNT );
 
+    // send null to pwm gains - dan
+    hubo_pwm_gains_t H_gains;
+    memset( &H_gains, 0, sizeof(H_gains) );
+
+
     setJointParams( &H_Param, &H_State );
 
     for(int i=0; i<8; i++)
